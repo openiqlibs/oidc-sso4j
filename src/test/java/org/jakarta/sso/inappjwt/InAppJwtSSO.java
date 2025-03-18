@@ -17,9 +17,9 @@ public class InAppJwtSSO extends AbstractSSOAuth {
 
 
     @Override
-    protected Set<String> verifyAndExtractRoles(String token) throws Exception {
+    public Set<String> verifyAndExtractRoles(String token) throws Exception {
         try {
-            inAppTokenAndCerts.
+
         } catch (Exception e) {
 
         }

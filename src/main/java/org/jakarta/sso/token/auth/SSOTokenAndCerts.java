@@ -24,9 +24,9 @@ public abstract class SSOTokenAndCerts {
 
     private final Logger logger = LoggerFactory.getLogger(SSOTokenAndCerts.class);
 
-    protected abstract String getSSO_JWKsUrl();
+    public abstract String getSSO_JWKsUrl();
 
-    protected abstract Set<String> getListOfRolesObjectKeys();
+    public abstract Set<String> getListOfRolesObjectKeys();
 
     public Map<String, PublicKey> publicKeyMap;
 
@@ -105,7 +105,7 @@ public abstract class SSOTokenAndCerts {
     }
 
     public void downloadAndStorePublicKeys() throws IOException, InterruptedException, NoSuchAlgorithmException, InvalidKeySpecException {
-        logger.info("downloading public keys");
+        logger.info("downloading public keys from {}", getSSO_JWKsUrl());
         Map<String,Object> certs = getSSOCerts(getSSO_JWKsUrl());
         publicKeyMap = getPublicKeys(certs);
     }

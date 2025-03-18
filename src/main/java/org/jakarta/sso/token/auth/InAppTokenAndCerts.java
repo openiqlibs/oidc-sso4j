@@ -24,6 +24,8 @@ public class InAppTokenAndCerts {
 
     private SecretKey secretKey;
 
+    private String issuer;
+
     private InAppTokenAndCerts() {}
 
     private void loadSecretKey() {
@@ -45,7 +47,7 @@ public class InAppTokenAndCerts {
         return roles;
     }
 
-    public Set<String> getRolesOfToken(String token, String kid) throws Exception {
+    public Set<String> getRolesOfToken(String token) throws Exception {
         Claims claims = null;
         try {
             if (keyToUse.equals(SigningKeyStandards.SECRET_KEY.getValue())) {
@@ -69,12 +71,12 @@ public class InAppTokenAndCerts {
         Date accessTokenExpiry = c.getTime();
         c.add(Calendar.HOUR_OF_DAY, refreshTokenValidity);
         Date refreshTokenExpiry = c.getTime();
-        responseTokens.put("accessToken", doGenerateToken(claims, subject, issuer, issuedAt, accessTokenExpiry));
-        responseTokens.put("refreshToken", doGenerateToken(claims, subject, issuer, issuedAt, refreshTokenExpiry));
+        responseTokens.put("accessToken", doGenerateToken(claims, subject, issuedAt, accessTokenExpiry));
+        responseTokens.put("refreshToken", doGenerateToken(claims, subject, issuedAt, refreshTokenExpiry));
         return responseTokens;
     }
 
-    public String doGenerateToken(Map<String, Object> claims, String subject, String issuer, Date issueAt, Date expireAt) {
+    public String doGenerateToken(Map<String, Object> claims, String subject, Date issueAt, Date expireAt) {
         return Jwts.builder().subject(subject).claims(claims)
                 .issuedAt(issueAt)
                 .issuer(issuer)
@@ -92,6 +94,11 @@ public class InAppTokenAndCerts {
 
         public Builder setSecretValue(String secret) {
             this.inAppTokenAndCerts.secret = secret;
+            return this;
+        }
+
+        public Builder setIssuer(String issuer) {
+            this.inAppTokenAndCerts.issuer = issuer;
             return this;
         }
 

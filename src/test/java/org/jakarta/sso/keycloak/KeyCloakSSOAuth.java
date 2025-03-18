@@ -15,7 +15,7 @@ public class KeyCloakSSOAuth extends AbstractSSOAuth {
     }
 
     @Override
-    protected Set<String> verifyAndExtractRoles(String token) throws Exception {
+    public Set<String> verifyAndExtractRoles(String token) throws Exception {
         try {
             String kid = getKid(getHeaders(token));
             return keyCloakSSOAndCerts.getRolesOfToken(token, kid);

@@ -7,7 +7,7 @@ import java.util.*;
 
 public abstract class AbstractSSOAuth {
 
-    protected abstract Set<String> verifyAndExtractRoles(String token) throws Exception;
+    public abstract Set<String> verifyAndExtractRoles(String token) throws Exception;
 
     public Map<String, Object> getHeaders(String token) throws IOException {
         Map<String, Object> headers;
