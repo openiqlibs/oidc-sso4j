@@ -25,16 +25,16 @@ public abstract class AbstractSSOTest {
 
     protected abstract String getEmptyKidToken();
 
-    protected abstract String getTestKid();
+    protected abstract String getTestKid() throws IOException;
 
     @Before
     public void setupObjs() throws IOException, NoSuchAlgorithmException, InvalidKeySpecException, InterruptedException {
         System.out.println("setting up objects...");
-        getSsoTokenAndCerts().downloadAndStorePublicKeys();
+        this.getSsoTokenAndCerts().downloadAndStorePublicKeys();
     }
 
     @Test
-    public void testKeyCloakSSOFlow() throws IOException, NoSuchAlgorithmException, InvalidKeySpecException, InterruptedException {
+    public void testKeyCloakSSOFlow() {
         Set<String> roles = null;
         try {
             roles = getSSOAuth().verifyAndExtractRoles(getToken());

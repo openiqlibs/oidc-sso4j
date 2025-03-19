@@ -24,11 +24,11 @@ public abstract class SSOTokenAndCerts {
 
     private final Logger logger = LoggerFactory.getLogger(SSOTokenAndCerts.class);
 
-    public abstract String getSSO_JWKsUrl();
+    protected abstract String getSSO_JWKsUrl();
 
-    public abstract Set<String> getListOfRolesObjectKeys();
+    protected abstract Set<String> getListOfRolesObjectKeys();
 
-    public Map<String, PublicKey> publicKeyMap;
+    private Map<String, PublicKey> publicKeyMap;
 
     protected Map<String, Object> getSSOCerts(String certsUrls) throws IOException, InterruptedException {
         ObjectMapper objectMapper = new ObjectMapper();
@@ -46,7 +46,7 @@ public abstract class SSOTokenAndCerts {
             }
             return objectMapper.readValue(responseBody, new TypeReference<>() {
             });
-        } catch (IOException | InterruptedException e) {
+        } catch (Exception e) {
             logger.error("unable to download keys from host ", e);
             throw e;
         }
@@ -70,7 +70,7 @@ public abstract class SSOTokenAndCerts {
                 BigInteger publicExponent = new BigInteger(1, urlDecoder.decode(key.get("e").toString()));
                 PublicKey publicKey = keyFactory.generatePublic(new RSAPublicKeySpec(modulus, publicExponent));
                 publicKeys.put(key.get("kid").toString(), publicKey);
-            } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+            } catch (Exception e) {
                 logger.error("sso error : Unable to generate public key from cert with kid: {}", key.get("kid").toString());
                 throw e;
             }

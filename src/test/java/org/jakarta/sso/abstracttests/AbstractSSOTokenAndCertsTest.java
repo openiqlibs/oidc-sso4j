@@ -18,17 +18,21 @@ public abstract class AbstractSSOTokenAndCertsTest {
     protected abstract AbstractSSOAuth getSSOAuth();
 
     protected abstract String token();
+    
+    protected abstract String getSSOUrl();
+
+    protected abstract Set<String> getListOfObjectKeys();
 
     @Test
     public void testGetJwksUrl() {
-        Assert.assertNotNull(getSsoTokenAndCerts().getSSO_JWKsUrl());
-        Assert.assertNotEquals("", getSsoTokenAndCerts().getSSO_JWKsUrl());
+        Assert.assertNotNull(getSSOUrl());
+        Assert.assertNotEquals("", getSSOUrl());
     }
 
     @Test
     public void testGetListOfRolesObjectKeys() {
-        Assert.assertNotNull(getSsoTokenAndCerts().getListOfRolesObjectKeys());
-        Assert.assertEquals(1, getSsoTokenAndCerts().getListOfRolesObjectKeys().size());
+        Assert.assertNotNull(getListOfObjectKeys());
+        Assert.assertEquals(2, getListOfObjectKeys().size());
     }
 
     @Test
