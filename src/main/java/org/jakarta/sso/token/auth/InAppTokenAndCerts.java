@@ -9,6 +9,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.crypto.SecretKey;
+import java.io.IOException;
+import java.security.KeyFactory;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.X509EncodedKeySpec;
 import java.util.*;
 
 public class InAppTokenAndCerts {
@@ -23,30 +31,87 @@ public class InAppTokenAndCerts {
 
     private String keyToUse;
 
+    private String publicKeyString;
+
+    private String privateKeyString;
+
     private SecretKey secretKey;
+
+    private PublicKey publicKey;
+
+    private PrivateKey privateKey;
 
     private String issuer;
 
     private InAppTokenAndCerts() {}
 
     protected void loadSecretKey() {
+        logger.info("loading secret key");
         byte[] key = secret.getBytes();
         this.secretKey = Keys.hmacShaKeyFor(key);
+    }
+
+    protected void loadPublicKey() throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
+        logger.info("loading public key");
+        String publicKeyPEM = publicKeyString
+                .replace("-----BEGIN PUBLIC KEY-----", "")
+                .replace("-----END PUBLIC KEY-----", "")
+                .replaceAll("\\s", "");
+
+        byte[] decodedKey = Base64.getDecoder().decode(publicKeyPEM);
+
+        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+        publicKey = keyFactory.generatePublic(new X509EncodedKeySpec(decodedKey));
+    }
+
+    protected void loadPrivateKey() throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
+        logger.info("loading private key");
+        String publicKeyPEM = privateKeyString
+                .replace("-----BEGIN PUBLIC KEY-----", "")
+                .replace("-----END PUBLIC KEY-----", "")
+                .replaceAll("\\s", "");
+
+        byte[] decodedKey = Base64.getDecoder().decode(publicKeyPEM);
+
+        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+        privateKey = keyFactory.generatePrivate(new PKCS8EncodedKeySpec(decodedKey));
     }
 
     protected void loadSigningKeys() {
         if (keyToUse.equals(SigningKeyStandards.SECRET_KEY.getValue())) {
             loadSecretKey();
         } else {
-            //load private-public key pair
+            try {
+                loadPrivateKey();
+                loadPublicKey();
+            } catch (Exception e) {
+                logger.error(e.getMessage());
+                throw new RuntimeException(e);
+            }
         }
     }
 
+    public static boolean isNullOrEmptyOrBlank(String str) {
+        return str == null || str.isEmpty() || str.isBlank();
+    }
+
     protected void validateFields() {
-        if (secret == null || secret.isEmpty() || secret.isBlank()) {
-            throw new RuntimeException("secret cannot be null or empty");
+        if (isNullOrEmptyOrBlank(keyToUse)) {
+            throw new RuntimeException("initialize signing key standard using signing key standard enum");
         }
-        if (issuer == null || issuer.isEmpty() || issuer.isBlank()) {
+        if (keyToUse.equals(SigningKeyStandards.SECRET_KEY.getValue())) {
+            if (isNullOrEmptyOrBlank(secret)) {
+                throw new RuntimeException("secret cannot be null or empty");
+            }
+        } else {
+            if (isNullOrEmptyOrBlank(privateKeyString)) {
+                throw new RuntimeException("path to private key pem file cannot be null or empty");
+            }
+            if (isNullOrEmptyOrBlank(publicKeyString)) {
+                throw new RuntimeException("path to public key pem file cannot be null or empty");
+            }
+        }
+        if (isNullOrEmptyOrBlank(issuer)) {
             throw new RuntimeException("issuer cannot be null or empty");
         }
         if (accessTokenValidity == 0 || accessTokenValidity > 15) {
@@ -54,9 +119,6 @@ public class InAppTokenAndCerts {
         }
         if (refreshTokenValidity == 0 || refreshTokenValidity > 24) {
             throw new RuntimeException("initialize access token validity and it should not be greater than 24 hours");
-        }
-        if (keyToUse == null || keyToUse.isEmpty() || keyToUse.isBlank()) {
-            throw new RuntimeException("initialize signing key standard using signing key standard enum");
         }
     }
 
@@ -76,7 +138,7 @@ public class InAppTokenAndCerts {
             if (keyToUse.equals(SigningKeyStandards.SECRET_KEY.getValue())) {
                 claims = Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload();
             } else {
-                //claims = Jwts.parser().verifyWith(publicKey).build().parseSignedClaims(token).getPayload();
+                claims = Jwts.parser().verifyWith(publicKey).build().parseSignedClaims(token).getPayload();
             }
             return extractRoles(claims);
         } catch (Exception e) {
@@ -85,7 +147,7 @@ public class InAppTokenAndCerts {
         }
     }
 
-    public Map<String, String> generateTokenPair(Map<String, Object> claims, String subject, String issuer) {
+    public Map<String, String> generateTokenPair(Map<String, Object> claims, String subject) {
         Map<String, String> responseTokens = new HashMap<>();
         Calendar c = Calendar.getInstance();
         c.setTime(new Date());
@@ -100,9 +162,6 @@ public class InAppTokenAndCerts {
     }
 
     public String doGenerateToken(Map<String, Object> claims, String subject, Date issueAt, Date expireAt) {
-        if (issuer == null || issuer.isEmpty() || issuer.isBlank()) {
-            throw new RuntimeException("issuer cannot be null");
-        }
         JwtBuilder builder = Jwts.builder().subject(subject).claims(claims)
                 .issuedAt(issueAt)
                 .issuer(issuer)
@@ -111,7 +170,7 @@ public class InAppTokenAndCerts {
         if (keyToUse.equals(SigningKeyStandards.SECRET_KEY.getValue())) {
             builder.signWith(secretKey);
         } else {
-            //builder.signWith(publicKey);
+            builder.signWith(privateKey);
         }
         return builder.compact();
     }
@@ -125,6 +184,16 @@ public class InAppTokenAndCerts {
 
         public Builder setSecretValue(String secret) {
             this.inAppTokenAndCerts.secret = secret;
+            return this;
+        }
+
+        public Builder setPublicKeyString(String publicKeyString) {
+            this.inAppTokenAndCerts.publicKeyString = publicKeyString;
+            return this;
+        }
+
+        public Builder setPrivateKeyString(String privateKeyString) {
+            this.inAppTokenAndCerts.privateKeyString = privateKeyString;
             return this;
         }
 
