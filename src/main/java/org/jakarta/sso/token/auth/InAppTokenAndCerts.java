@@ -23,6 +23,10 @@ public class InAppTokenAndCerts {
 
     private final Logger logger = LoggerFactory.getLogger(InAppTokenAndCerts.class);
 
+    public static final String ACCESS_TOKEN = "accessToken";
+
+    public static final String REFRESH_TOKEN = "refreshToken";
+
     private String secret;
 
     private int accessTokenValidity;
@@ -51,7 +55,7 @@ public class InAppTokenAndCerts {
         this.secretKey = Keys.hmacShaKeyFor(key);
     }
 
-    protected void loadPublicKey() throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
+    private void loadPublicKey() throws NoSuchAlgorithmException, InvalidKeySpecException {
         logger.info("loading public key");
         String publicKeyPEM = publicKeyString
                 .replace("-----BEGIN PUBLIC KEY-----", "")
@@ -64,14 +68,14 @@ public class InAppTokenAndCerts {
         publicKey = keyFactory.generatePublic(new X509EncodedKeySpec(decodedKey));
     }
 
-    protected void loadPrivateKey() throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
+    private void loadPrivateKey() throws NoSuchAlgorithmException, InvalidKeySpecException {
         logger.info("loading private key");
-        String publicKeyPEM = privateKeyString
+        String privateKeyPEM = privateKeyString
                 .replace("-----BEGIN PUBLIC KEY-----", "")
                 .replace("-----END PUBLIC KEY-----", "")
                 .replaceAll("\\s", "");
 
-        byte[] decodedKey = Base64.getDecoder().decode(publicKeyPEM);
+        byte[] decodedKey = Base64.getDecoder().decode(privateKeyPEM);
 
         KeyFactory keyFactory = KeyFactory.getInstance("RSA");
         privateKey = keyFactory.generatePrivate(new PKCS8EncodedKeySpec(decodedKey));
@@ -105,10 +109,10 @@ public class InAppTokenAndCerts {
             }
         } else {
             if (isNullOrEmptyOrBlank(privateKeyString)) {
-                throw new RuntimeException("path to private key pem file cannot be null or empty");
+                throw new RuntimeException("private key string cannot be null or empty");
             }
             if (isNullOrEmptyOrBlank(publicKeyString)) {
-                throw new RuntimeException("path to public key pem file cannot be null or empty");
+                throw new RuntimeException("public key string cannot be null or empty");
             }
         }
         if (isNullOrEmptyOrBlank(issuer)) {
@@ -127,7 +131,7 @@ public class InAppTokenAndCerts {
         if (claims.containsKey("roles")) {
             roles.addAll((Collection<String>) claims.get("roles"));
         } else {
-            throw new RuntimeException("no 'roles' key present to extract roles from claims");
+            logger.error("no 'roles' key present to extract roles from claims");
         }
         return roles;
     }
@@ -156,8 +160,8 @@ public class InAppTokenAndCerts {
         Date accessTokenExpiry = c.getTime();
         c.add(Calendar.HOUR_OF_DAY, refreshTokenValidity);
         Date refreshTokenExpiry = c.getTime();
-        responseTokens.put("accessToken", doGenerateToken(claims, subject, issuedAt, accessTokenExpiry));
-        responseTokens.put("refreshToken", doGenerateToken(claims, subject, issuedAt, refreshTokenExpiry));
+        responseTokens.put(ACCESS_TOKEN, doGenerateToken(claims, subject, issuedAt, accessTokenExpiry));
+        responseTokens.put(REFRESH_TOKEN, doGenerateToken(claims, subject, issuedAt, refreshTokenExpiry));
         return responseTokens;
     }
 
