@@ -1,10 +1,13 @@
-package com.sso4j.sso.keycloak;
+package com.sso4j.sso.auth0;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sso4j.sso.abstracttests.AbstractSSOTest;
+import com.sso4j.sso.defaults.auth.DefaultAuth0SSOTokenAndCerts;
+import com.sso4j.sso.keycloak.KeycloakSSOTest;
 import com.sso4j.sso.token.auth.AbstractSSOAuth;
 import com.sso4j.sso.token.auth.AbstractSSOTokenAndCerts;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 
 import java.io.IOException;
@@ -12,25 +15,30 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
-public class KeycloakSSOTest extends AbstractSSOTest {
+public class DefaultAuth0SSOTest extends AbstractSSOTest {
 
-    private KeyCloakSSOAndCerts keyCloakSSOAndCerts = new KeyCloakSSOAndCerts();
+    DefaultAuth0SSOTokenAndCerts defaultAuth0SSOTokenAndCerts = new DefaultAuth0SSOTokenAndCerts(System.getenv("auth0_domain") + "/.well-known/jwks.json");
 
-    public static Map<String, Object> ssoResponse = new HashMap<>();
-    public static Map<String, Object> ssoResponse2 = new HashMap<>();
+    public static Map<String, Object> auth0ssoResponse = new HashMap<>();
 
     private static Map<String, Object> getSSOAuthResponse(String url) throws IOException, InterruptedException {
-        String formEncoded = "client_id=test-app&username=test-user&password=12345&grant_type=password";
+        Map<String, String> requestMap = new HashMap<>();
+        requestMap.put("grant_type", System.getenv("grant_type"));
+        requestMap.put("client_id", System.getenv("client_id"));
+        requestMap.put("client_secret", System.getenv("client_secret"));
+        requestMap.put("audience", System.getenv("audience"));
+
         ObjectMapper objectMapper = new ObjectMapper();
+        String jsonString = objectMapper.writeValueAsString(requestMap);
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(url))
-                .header("Content-Type", "application/x-www-form-urlencoded")
-                .POST(HttpRequest.BodyPublishers.ofString(formEncoded, StandardCharsets.UTF_8))
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(jsonString))
                 .build();
         HttpResponse<String> response;
         try {
@@ -46,34 +54,32 @@ public class KeycloakSSOTest extends AbstractSSOTest {
         }
     }
 
-    @BeforeClass
-    public static void loadSSOResponse() throws IOException, InterruptedException {
-        System.out.println("getting sso tokens..");
-        Map<String, Object> resp = getSSOAuthResponse("http://localhost:8080/realms/testing/protocol/openid-connect/token");
-        Map<String, Object> resp2 = getSSOAuthResponse("http://localhost:8080/realms/testing-2/protocol/openid-connect/token");
 
-        ssoResponse.putAll(resp);
-        ssoResponse2.putAll(resp2);
+    @BeforeClass
+    public static void setup() throws IOException, InterruptedException {
+        System.out.println("getting auth0 sso tokens..");
+        auth0ssoResponse.putAll(getSSOAuthResponse(System.getenv("auth0_domain") + "/oauth/token"));
+        KeycloakSSOTest.loadSSOResponse();
     }
 
     @Override
     protected AbstractSSOTokenAndCerts getSsoTokenAndCerts() {
-        return keyCloakSSOAndCerts;
+        return defaultAuth0SSOTokenAndCerts;
     }
 
     @Override
     protected AbstractSSOAuth getSSOAuth() {
-        return new KeyCloakSSOAuth(keyCloakSSOAndCerts);
+        return new Auth0SSOAuth(defaultAuth0SSOTokenAndCerts);
     }
 
     @Override
     protected String getToken() {
-        return ssoResponse.get("access_token").toString();
+        return auth0ssoResponse.get("access_token").toString();
     }
 
     @Override
     protected String getDiffKidToken() {
-        return ssoResponse2.get("access_token").toString();
+        return KeycloakSSOTest.ssoResponse.get("access_token").toString();
     }
 
     @Override
@@ -83,7 +89,26 @@ public class KeycloakSSOTest extends AbstractSSOTest {
 
     @Override
     protected String getTestKid() throws IOException {
-        String token = ssoResponse.get("access_token").toString();
+        String token = auth0ssoResponse.get("access_token").toString();
         return getSSOAuth().getKid(getSSOAuth().getHeaders(token));
+    }
+
+    @Override
+    public void testGetIssuer() throws IOException {
+        Map<String, Object> payload = getSSOAuth().getPayload(getToken());
+        String issuer = getSSOAuth().getIssuer(payload);
+        org.junit.Assert.assertNotNull(issuer);
+        Assert.assertEquals(System.getenv("auth0_issuer"), issuer);
+    }
+
+    @Override
+    public void testKeyCloakSSOFlow() {
+        Set<String> roles = null;
+        try {
+            roles = getSSOAuth().verifyAndExtractRoles(getToken());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        Assert.assertEquals(4, roles.size());
     }
 }

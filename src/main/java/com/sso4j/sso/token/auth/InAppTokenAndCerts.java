@@ -46,6 +46,10 @@ public class InAppTokenAndCerts {
 
     private String issuer;
 
+    private String audience;
+
+    private RoleExtractor roleExtractor;
+
     private InAppTokenAndCerts() {}
 
     protected void loadSecretKey() {
@@ -98,6 +102,13 @@ public class InAppTokenAndCerts {
         return str == null || str.isEmpty() || str.isBlank();
     }
 
+    private void setupRoleExtractor() {
+        if (roleExtractor == null) {
+            logger.info("setting default role extractor");
+            roleExtractor = new DefaultRoleExtractor();
+        }
+    }
+
     protected void validateFields() {
         if (isNullOrEmptyOrBlank(keyToUse)) {
             throw new RuntimeException("initialize signing key standard using signing key standard enum");
@@ -117,22 +128,15 @@ public class InAppTokenAndCerts {
         if (isNullOrEmptyOrBlank(issuer)) {
             throw new RuntimeException("issuer cannot be null or empty");
         }
+        if (isNullOrEmptyOrBlank(audience)) {
+            throw new RuntimeException("audience cannot be null or empty");
+        }
         if (accessTokenValidity == 0 || accessTokenValidity > 15) {
             throw new RuntimeException("initialize access token validity and it should not be greater than 15 minutes");
         }
         if (refreshTokenValidity == 0 || refreshTokenValidity > 24) {
             throw new RuntimeException("initialize access token validity and it should not be greater than 24 hours");
         }
-    }
-
-    protected Set<String> extractRoles(Claims claims) {
-        Set<String> roles = new HashSet<>();
-        if (claims.containsKey("roles")) {
-            roles.addAll((Collection<String>) claims.get("roles"));
-        } else {
-            logger.error("no 'roles' key present to extract roles from claims");
-        }
-        return roles;
     }
 
     public Set<String> getRolesOfToken(String token) throws Exception {
@@ -143,7 +147,7 @@ public class InAppTokenAndCerts {
             } else {
                 claims = Jwts.parser().verifyWith(publicKey).build().parseSignedClaims(token).getPayload();
             }
-            return extractRoles(claims);
+            return roleExtractor.extractRoles(claims);
         } catch (Exception e) {
             logger.error(e.getMessage());
             throw e;
@@ -185,6 +189,11 @@ public class InAppTokenAndCerts {
             this.inAppTokenAndCerts = new InAppTokenAndCerts();
         }
 
+        public Builder setRoleExtractor(RoleExtractor roleExtractor) {
+            this.inAppTokenAndCerts.roleExtractor = roleExtractor;
+            return this;
+        }
+
         public Builder setSecretValue(String secret) {
             this.inAppTokenAndCerts.secret = secret;
             return this;
@@ -205,6 +214,11 @@ public class InAppTokenAndCerts {
             return this;
         }
 
+        public Builder setAudience(String audience) {
+            this.inAppTokenAndCerts.audience = audience;
+            return this;
+        }
+
         public Builder setAccessTokenValidityInMinutes(int validityInMinutes) {
             this.inAppTokenAndCerts.accessTokenValidity = validityInMinutes;
             return this;
@@ -222,6 +236,7 @@ public class InAppTokenAndCerts {
 
         public InAppTokenAndCerts build() {
             this.inAppTokenAndCerts.validateFields();
+            this.inAppTokenAndCerts.setupRoleExtractor();
             this.inAppTokenAndCerts.loadSigningKeys();
             return this.inAppTokenAndCerts;
         }

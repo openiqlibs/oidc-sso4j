@@ -20,13 +20,13 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.RSAPublicKeySpec;
 import java.util.*;
 
-public abstract class SSOTokenAndCerts {
+public abstract class AbstractSSOTokenAndCerts {
 
-    private final Logger logger = LoggerFactory.getLogger(SSOTokenAndCerts.class);
+    private final Logger logger = LoggerFactory.getLogger(AbstractSSOTokenAndCerts.class);
 
-    protected abstract String getSSO_JWKsUrl();
+    public abstract String getSSO_JWKsUrl();
 
-    protected abstract Set<String> getListOfRolesObjectKeys();
+    public abstract Set<String> getListOfRolesObjectKeys();
 
     private Map<String, PublicKey> publicKeyMap;
 

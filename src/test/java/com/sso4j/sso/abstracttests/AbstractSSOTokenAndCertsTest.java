@@ -1,7 +1,7 @@
 package com.sso4j.sso.abstracttests;
 
 import com.sso4j.sso.token.auth.AbstractSSOAuth;
-import com.sso4j.sso.token.auth.SSOTokenAndCerts;
+import com.sso4j.sso.token.auth.AbstractSSOTokenAndCerts;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -9,30 +9,26 @@ import java.util.Set;
 
 public abstract class AbstractSSOTokenAndCertsTest {
 
-    protected abstract SSOTokenAndCerts getSsoTokenAndCerts();
+    protected abstract AbstractSSOTokenAndCerts getSsoTokenAndCerts();
 
-    protected abstract SSOTokenAndCerts getNotExistRealmSSOAndCerts();
+    protected abstract AbstractSSOTokenAndCerts getNotExistRealmSSOAndCerts();
 
-    protected abstract SSOTokenAndCerts getAnotherKeycloakSSOAndCerts();
+    protected abstract AbstractSSOTokenAndCerts getAnotherKeycloakSSOAndCerts();
 
     protected abstract AbstractSSOAuth getSSOAuth();
 
     protected abstract String token();
-    
-    protected abstract String getSSOUrl();
-
-    protected abstract Set<String> getListOfObjectKeys();
 
     @Test
     public void testGetJwksUrl() {
-        Assert.assertNotNull(getSSOUrl());
-        Assert.assertNotEquals("", getSSOUrl());
+        Assert.assertNotNull(getSsoTokenAndCerts().getSSO_JWKsUrl());
+        Assert.assertNotEquals("", getSsoTokenAndCerts().getSSO_JWKsUrl());
     }
 
     @Test
     public void testGetListOfRolesObjectKeys() {
-        Assert.assertNotNull(getListOfObjectKeys());
-        Assert.assertEquals(2, getListOfObjectKeys().size());
+        Assert.assertNotNull(getSsoTokenAndCerts().getListOfRolesObjectKeys());
+        Assert.assertEquals(2, getSsoTokenAndCerts().getListOfRolesObjectKeys().size());
     }
 
     @Test

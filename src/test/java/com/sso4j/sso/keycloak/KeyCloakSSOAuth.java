@@ -2,15 +2,15 @@ package com.sso4j.sso.keycloak;
 
 
 import com.sso4j.sso.token.auth.AbstractSSOAuth;
-import com.sso4j.sso.token.auth.SSOTokenAndCerts;
+import com.sso4j.sso.token.auth.AbstractSSOTokenAndCerts;
 
 import java.util.Set;
 
 public class KeyCloakSSOAuth extends AbstractSSOAuth {
 
-    private final SSOTokenAndCerts keyCloakSSOAndCerts;
+    private final AbstractSSOTokenAndCerts keyCloakSSOAndCerts;
 
-    public KeyCloakSSOAuth(SSOTokenAndCerts keyCloakSSOAndCerts) {
+    public KeyCloakSSOAuth(AbstractSSOTokenAndCerts keyCloakSSOAndCerts) {
         this.keyCloakSSOAndCerts = keyCloakSSOAndCerts;
     }
 

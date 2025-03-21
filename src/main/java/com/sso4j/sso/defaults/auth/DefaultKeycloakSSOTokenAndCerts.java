@@ -2,7 +2,7 @@ package com.sso4j.sso.defaults.auth;
 
 import io.jsonwebtoken.Claims;
 import com.sso4j.sso.enums.KeycloakScopes;
-import com.sso4j.sso.token.auth.SSOTokenAndCerts;
+import com.sso4j.sso.token.auth.AbstractSSOTokenAndCerts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,24 +11,24 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class DefaultKeycloakSSOTokenAndCerts extends SSOTokenAndCerts {
+public class DefaultKeycloakSSOTokenAndCerts extends AbstractSSOTokenAndCerts {
 
     private final Logger logger = LoggerFactory.getLogger(DefaultKeycloakSSOTokenAndCerts.class);
 
-    private String keycloakUrl;
+    private String keyCloakJwksUrl;
 
     @Override
-    protected String getSSO_JWKsUrl() {
-        return keycloakUrl;
+    public String getSSO_JWKsUrl() {
+        return keyCloakJwksUrl;
     }
 
     @Override
-    protected Set<String> getListOfRolesObjectKeys() {
+    public Set<String> getListOfRolesObjectKeys() {
         return Set.of(KeycloakScopes.REALM_ACCESS.getValue(), KeycloakScopes.RESOURCE_ACCESS.getValue());
     }
 
-    public DefaultKeycloakSSOTokenAndCerts(String keycloakUrl) {
-        this.keycloakUrl = keycloakUrl;
+    public DefaultKeycloakSSOTokenAndCerts(String keyCloakJwksUrl) {
+        this.keyCloakJwksUrl = keyCloakJwksUrl;
     }
 
     @Override

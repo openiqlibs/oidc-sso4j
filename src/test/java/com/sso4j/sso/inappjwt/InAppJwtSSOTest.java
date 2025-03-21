@@ -6,6 +6,7 @@ import com.sso4j.sso.enums.SigningKeyStandards;
 import com.sso4j.sso.token.auth.InAppTokenAndCerts;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.List;
@@ -81,6 +82,7 @@ public abstract class InAppJwtSSOTest {
             new InAppTokenAndCerts.Builder()
                     .setSecretValue("nlcksncjdksjiefowhuhdiuwgdyfewghcdfcuwgdikqjdknjwchkuehwyuvxctywev")
                     .setIssuer("testing")
+                    .setAudience("testing")
                     .setAccessTokenValidityInMinutes(10)
                     .setRefreshTokenValidityInHours(12)
                     .build();
@@ -97,6 +99,7 @@ public abstract class InAppJwtSSOTest {
             new InAppTokenAndCerts.Builder()
                     .usingSigningKeyStandard(SigningKeyStandards.SECRET_KEY)
                     .setIssuer("testing")
+                    .setAudience("testing")
                     .setAccessTokenValidityInMinutes(10)
                     .setRefreshTokenValidityInHours(12)
                     .build();
@@ -113,6 +116,7 @@ public abstract class InAppJwtSSOTest {
             new InAppTokenAndCerts.Builder()
                     .setSecretValue("nlcksncjdksjiefowhuhdiuwgdyfewghcdfcuwgdikqjdknjwchkuehwyuvxctywev")
                     .usingSigningKeyStandard(SigningKeyStandards.SECRET_KEY)
+                    .setAudience("testing")
                     .setAccessTokenValidityInMinutes(10)
                     .setRefreshTokenValidityInHours(12)
                     .build();
@@ -124,12 +128,30 @@ public abstract class InAppJwtSSOTest {
     }
 
     @Test
+    public void testValidateFieldAudience() {
+        try {
+            new InAppTokenAndCerts.Builder()
+                    .setSecretValue("nlcksncjdksjiefowhuhdiuwgdyfewghcdfcuwgdikqjdknjwchkuehwyuvxctywev")
+                    .setIssuer("testing")
+                    .usingSigningKeyStandard(SigningKeyStandards.SECRET_KEY)
+                    .setAccessTokenValidityInMinutes(10)
+                    .setRefreshTokenValidityInHours(12)
+                    .build();
+        } catch (Exception e) {
+            boolean isRunTimeException = e instanceof RuntimeException;
+            Assert.assertTrue(isRunTimeException);
+            Assert.assertEquals("audience cannot be null or empty", e.getMessage());
+        }
+    }
+
+    @Test
     public void testValidateFieldAccessTokenValidity() {
         try {
             new InAppTokenAndCerts.Builder()
                     .setSecretValue("nlcksncjdksjiefowhuhdiuwgdyfewghcdfcuwgdikqjdknjwchkuehwyuvxctywev")
                     .usingSigningKeyStandard(SigningKeyStandards.SECRET_KEY)
                     .setIssuer("testing")
+                    .setAudience("testing")
                     .setRefreshTokenValidityInHours(12)
                     .build();
         } catch (Exception e) {
@@ -143,6 +165,7 @@ public abstract class InAppJwtSSOTest {
                     .setSecretValue("nlcksncjdksjiefowhuhdiuwgdyfewghcdfcuwgdikqjdknjwchkuehwyuvxctywev")
                     .usingSigningKeyStandard(SigningKeyStandards.SECRET_KEY)
                     .setIssuer("testing")
+                    .setAudience("testing")
                     .setAccessTokenValidityInMinutes(20)
                     .setRefreshTokenValidityInHours(12)
                     .build();
@@ -160,6 +183,7 @@ public abstract class InAppJwtSSOTest {
                     .setSecretValue("nlcksncjdksjiefowhuhdiuwgdyfewghcdfcuwgdikqjdknjwchkuehwyuvxctywev")
                     .usingSigningKeyStandard(SigningKeyStandards.SECRET_KEY)
                     .setIssuer("testing")
+                    .setAudience("testing")
                     .setAccessTokenValidityInMinutes(10)
                     .build();
         } catch (Exception e) {
@@ -173,6 +197,7 @@ public abstract class InAppJwtSSOTest {
                     .setSecretValue("nlcksncjdksjiefowhuhdiuwgdyfewghcdfcuwgdikqjdknjwchkuehwyuvxctywev")
                     .usingSigningKeyStandard(SigningKeyStandards.SECRET_KEY)
                     .setIssuer("testing")
+                    .setAudience("testing")
                     .setAccessTokenValidityInMinutes(10)
                     .setRefreshTokenValidityInHours(30)
                     .build();
@@ -189,6 +214,7 @@ public abstract class InAppJwtSSOTest {
             new InAppTokenAndCerts.Builder()
                     .setPrivateKeyString("jdkjdkshdkjshdkshdk")
                     .usingSigningKeyStandard(SigningKeyStandards.PUBLIC_KEY)
+                    .setAudience("testing")
                     .setAccessTokenValidityInMinutes(10)
                     .setRefreshTokenValidityInHours(12)
                     .build();
@@ -202,6 +228,7 @@ public abstract class InAppJwtSSOTest {
             new InAppTokenAndCerts.Builder()
                     .setPublicKeyString("jdkjdkshdkjshdkshdk")
                     .usingSigningKeyStandard(SigningKeyStandards.PUBLIC_KEY)
+                    .setAudience("testing")
                     .setAccessTokenValidityInMinutes(10)
                     .setRefreshTokenValidityInHours(12)
                     .build();

@@ -2,13 +2,12 @@ package com.sso4j.sso.keycloak;
 
 import com.sso4j.sso.abstracttests.AbstractSSOTokenAndCertsTest;
 import com.sso4j.sso.token.auth.AbstractSSOAuth;
-import com.sso4j.sso.token.auth.SSOTokenAndCerts;
+import com.sso4j.sso.token.auth.AbstractSSOTokenAndCerts;
 import org.junit.BeforeClass;
 
 import java.io.IOException;
-import java.util.Set;
 
-public class KeycloakSSOTokenAndCertsTest extends AbstractSSOTokenAndCertsTest {
+public class KeycloakAbstractSSOTokenAndCertsTest extends AbstractSSOTokenAndCertsTest {
 
     private AnotherKeycloakSSOAndCerts anotherKeycloakSSOAndCerts = new AnotherKeycloakSSOAndCerts();
     private KeyCloakSSOAndCerts keyCloakSSOAndCerts = new KeyCloakSSOAndCerts();
@@ -22,17 +21,17 @@ public class KeycloakSSOTokenAndCertsTest extends AbstractSSOTokenAndCertsTest {
     }
 
     @Override
-    protected SSOTokenAndCerts getSsoTokenAndCerts() {
+    protected AbstractSSOTokenAndCerts getSsoTokenAndCerts() {
         return keyCloakSSOAndCerts;
     }
 
     @Override
-    protected SSOTokenAndCerts getNotExistRealmSSOAndCerts() {
+    protected AbstractSSOTokenAndCerts getNotExistRealmSSOAndCerts() {
         return new NotExistRealmSSOAndCerts();
     }
 
     @Override
-    protected SSOTokenAndCerts getAnotherKeycloakSSOAndCerts() {
+    protected AbstractSSOTokenAndCerts getAnotherKeycloakSSOAndCerts() {
         return anotherKeycloakSSOAndCerts;
     }
 
@@ -44,15 +43,5 @@ public class KeycloakSSOTokenAndCertsTest extends AbstractSSOTokenAndCertsTest {
     @Override
     protected String token() {
         return token;
-    }
-
-    @Override
-    protected String getSSOUrl() {
-        return keyCloakSSOAndCerts.getSSO_JWKsUrl();
-    }
-
-    @Override
-    protected Set<String> getListOfObjectKeys() {
-        return keyCloakSSOAndCerts.getListOfRolesObjectKeys();
     }
 }

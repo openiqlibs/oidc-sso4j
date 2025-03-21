@@ -2,7 +2,7 @@ package com.sso4j.sso.abstracttests;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import com.sso4j.sso.token.auth.AbstractSSOAuth;
-import com.sso4j.sso.token.auth.SSOTokenAndCerts;
+import com.sso4j.sso.token.auth.AbstractSSOTokenAndCerts;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -15,7 +15,7 @@ import java.util.Set;
 
 public abstract class AbstractSSOTest {
 
-    protected abstract SSOTokenAndCerts getSsoTokenAndCerts();
+    protected abstract AbstractSSOTokenAndCerts getSsoTokenAndCerts();
 
     protected abstract AbstractSSOAuth getSSOAuth();
 

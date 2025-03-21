@@ -9,6 +9,7 @@ public class SecretKeyInAppJwtSSOTest extends InAppJwtSSOTest{
             .setSecretValue("nlcksncjdksjiefowhuhdiuwgdyfewghcdfcuwgdikqjdknjwchkuehwyuvxctywev")
             .usingSigningKeyStandard(SigningKeyStandards.SECRET_KEY)
             .setIssuer("testing")
+            .setAudience("testing")
             .setAccessTokenValidityInMinutes(10)
             .setRefreshTokenValidityInHours(12)
             .build();
@@ -17,6 +18,7 @@ public class SecretKeyInAppJwtSSOTest extends InAppJwtSSOTest{
             .setSecretValue("nlcksncjdksjiefowhuhdiuwgdyfewghcdfcuwgdikqjdknjwchkuehwyuvxctywev")
             .usingSigningKeyStandard(SigningKeyStandards.SECRET_KEY)
             .setIssuer("testing")
+            .setAudience("testing")
             .setAccessTokenValidityInMinutes(1)
             .setRefreshTokenValidityInHours(12)
             .build();
@@ -25,6 +27,7 @@ public class SecretKeyInAppJwtSSOTest extends InAppJwtSSOTest{
             .setSecretValue("nlcksncjdksjiefowhuhdkiwgdyfewghcdfcuwgdikqjdknjwchkuehwyuvxctywev")
             .usingSigningKeyStandard(SigningKeyStandards.SECRET_KEY)
             .setIssuer("testing")
+            .setAudience("testing")
             .setAccessTokenValidityInMinutes(10)
             .setRefreshTokenValidityInHours(12)
             .build();

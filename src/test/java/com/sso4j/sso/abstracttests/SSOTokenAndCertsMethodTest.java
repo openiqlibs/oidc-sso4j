@@ -1,6 +1,6 @@
 package com.sso4j.sso.abstracttests;
 
-import com.sso4j.sso.token.auth.SSOTokenAndCerts;
+import com.sso4j.sso.token.auth.AbstractSSOTokenAndCerts;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -10,7 +10,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.*;
 
-public class SSOTokenAndCertsMethodTest extends SSOTokenAndCerts {
+public class SSOTokenAndCertsMethodTest extends AbstractSSOTokenAndCerts {
 
     private Map<String, Object> withWrongAlg = new HashMap<>();
     private Map<String, Object> withWrongModAndExp =new HashMap<>();
@@ -32,12 +32,12 @@ public class SSOTokenAndCertsMethodTest extends SSOTokenAndCerts {
     }
 
     @Override
-    protected String getSSO_JWKsUrl() {
+    public String getSSO_JWKsUrl() {
         return "http://localhost:8080/realms/testing/protocol/openid-connect/certs";
     }
 
     @Override
-    protected Set<String> getListOfRolesObjectKeys() {
+    public Set<String> getListOfRolesObjectKeys() {
         return Set.of("realm_access");
     }
 
