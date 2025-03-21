@@ -15,8 +15,8 @@ public class PrivatePublicInAppJwtSSOTest extends InAppJwtSSOTest{
             .build();
 
     InAppTokenAndCerts inAppDiffTokenAndCerts = new InAppTokenAndCerts.Builder()
-            .setPrivateKeyString(System.getenv("privateKey"))
-            .setPublicKeyString(System.getenv("publicKey"))
+            .setPrivateKeyString(System.getenv("privateKey2"))
+            .setPublicKeyString(System.getenv("publicKey2"))
             .usingSigningKeyStandard(SigningKeyStandards.PUBLIC_KEY)
             .setIssuer("testing")
             .setAccessTokenValidityInMinutes(10)
@@ -28,7 +28,7 @@ public class PrivatePublicInAppJwtSSOTest extends InAppJwtSSOTest{
             .setPublicKeyString(System.getenv("publicKey"))
             .usingSigningKeyStandard(SigningKeyStandards.PUBLIC_KEY)
             .setIssuer("testing")
-            .setAccessTokenValidityInMinutes(10)
+            .setAccessTokenValidityInMinutes(1)
             .setRefreshTokenValidityInHours(12)
             .build();
 

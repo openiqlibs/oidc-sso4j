@@ -71,8 +71,8 @@ public class InAppTokenAndCerts {
     private void loadPrivateKey() throws NoSuchAlgorithmException, InvalidKeySpecException {
         logger.info("loading private key");
         String privateKeyPEM = privateKeyString
-                .replace("-----BEGIN PUBLIC KEY-----", "")
-                .replace("-----END PUBLIC KEY-----", "")
+                .replace("-----BEGIN PRIVATE KEY-----", "")
+                .replace("-----END PRIVATE KEY-----", "")
                 .replaceAll("\\s", "");
 
         byte[] decodedKey = Base64.getDecoder().decode(privateKeyPEM);
