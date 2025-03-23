@@ -7,7 +7,7 @@ import org.junit.BeforeClass;
 
 import java.io.IOException;
 
-public class KeycloakAbstractSSOTokenAndCertsTest extends AbstractSSOTokenAndCertsTest {
+public class KeycloakSSOTokenAndCertsTest extends AbstractSSOTokenAndCertsTest {
 
     private AnotherKeycloakSSOAndCerts anotherKeycloakSSOAndCerts = new AnotherKeycloakSSOAndCerts();
     private KeyCloakSSOAndCerts keyCloakSSOAndCerts = new KeyCloakSSOAndCerts();

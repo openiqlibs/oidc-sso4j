@@ -20,21 +20,49 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.RSAPublicKeySpec;
 import java.util.*;
 
+/**
+ * This abstract class is used get token related certs and validation of token.
+ * Also contains useful methods for downloading and loading certs to public keys.
+ * Needs to extend to use this library.
+ */
 public abstract class AbstractSSOTokenAndCerts {
 
     private final Logger logger = LoggerFactory.getLogger(AbstractSSOTokenAndCerts.class);
 
+    /**
+     * Abstract method to get sso jwks(certs) url so that can be downloaded
+     * Needs to override and implement in extended class
+     * Returns jwks(certs) url of sso provider
+     * @return {@code String}
+     */
     public abstract String getSSO_JWKsUrl();
 
-    public abstract Set<String> getListOfRolesObjectKeys();
+    /**
+     * Abstract method to get set of roles object keys
+     * Needs to override and implement in extended class
+     * Returns {@code Set<String>} roles object key
+     * @return {@code Set<String>}
+     */
+    public abstract Set<String> getSetOfRolesObjectKeys();
 
+    /**
+     * Map of public keys which is loaded after downloading certs from given url {@code getSSO_JWKsUrl()}
+     */
     private Map<String, PublicKey> publicKeyMap;
 
-    protected Map<String, Object> getSSOCerts(String certsUrls) throws IOException, InterruptedException {
+    /**
+     * This method used to download certs from given certsUrl. uses java11 {@code Httpclient} to download.
+     * Takes String certsUrl and returns certs map {@code Map<String, Object>}
+     * @param certsUrl
+     * @throws IOException
+     * @throws InterruptedException
+     * @return {@code Map<String,Object>}
+     */
+    protected Map<String, Object> getSSOCerts(String certsUrl) throws IOException, InterruptedException {
         ObjectMapper objectMapper = new ObjectMapper();
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(certsUrls))
+                .uri(URI.create(certsUrl))
                 .GET()
                 .build();
         HttpResponse<String> response;
@@ -52,6 +80,13 @@ public abstract class AbstractSSOTokenAndCerts {
         }
     }
 
+    /**
+     * Method is to load downloaded certs into publicKeyMap
+     * @param certs
+     * @throws NoSuchAlgorithmException
+     * @throws InvalidKeySpecException
+     * @return Map<String, Object> publicKeys
+     */
     protected Map<String, PublicKey> getPublicKeys(Map<String, Object> certs) throws NoSuchAlgorithmException, InvalidKeySpecException {
         Map<String, PublicKey> publicKeys = new HashMap<String, PublicKey>();
 
@@ -79,19 +114,21 @@ public abstract class AbstractSSOTokenAndCerts {
         return publicKeys;
     }
 
-    protected Set<String> extractRoles(Claims claims) {
-        Set<String> roles = new HashSet<>();
-        for (String key : getListOfRolesObjectKeys()) {
-            if (claims.containsKey(key)) {
-                Map<String, Object> keyValueObj = (Map<String, Object>) claims.get(key);
-                roles.addAll((Collection<String>) keyValueObj.get("roles"));
-            } else {
-                logger.error("no roles present with key {}", key);
-            }
-        }
-        return roles;
-    }
+    /**
+     * Abstract method need to be implemented in extended class which extracts roles from claims object
+     * and returns set of string of roles
+     * @param claims
+     * @return Set<String>
+     */
+    protected abstract Set<String> extractRoles(Claims claims);
 
+    /**
+     * Method validates token using public keys and calls extractRole method to get roles from token
+     * @param token
+     * @param kid
+     * @throws Exception
+     * @return Set<String>
+     */
     public Set<String> getRolesOfToken(String token, String kid) throws Exception {
         Claims claims;
         try {
@@ -104,6 +141,13 @@ public abstract class AbstractSSOTokenAndCerts {
         return extractRoles(claims);
     }
 
+    /**
+     * Method downloads certs from url and initiate public keys using certs
+     * @throws IOException
+     * @throws InterruptedException
+     * @throws NoSuchAlgorithmException
+     * @throws InvalidKeySpecException
+     */
     public void downloadAndStorePublicKeys() throws IOException, InterruptedException, NoSuchAlgorithmException, InvalidKeySpecException {
         logger.info("downloading public keys from {}", getSSO_JWKsUrl());
         Map<String,Object> certs = getSSOCerts(getSSO_JWKsUrl());

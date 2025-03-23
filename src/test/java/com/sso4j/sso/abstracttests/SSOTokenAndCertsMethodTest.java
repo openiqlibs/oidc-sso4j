@@ -1,6 +1,7 @@
 package com.sso4j.sso.abstracttests;
 
 import com.sso4j.sso.token.auth.AbstractSSOTokenAndCerts;
+import io.jsonwebtoken.Claims;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -37,8 +38,22 @@ public class SSOTokenAndCertsMethodTest extends AbstractSSOTokenAndCerts {
     }
 
     @Override
-    public Set<String> getListOfRolesObjectKeys() {
+    public Set<String> getSetOfRolesObjectKeys() {
         return Set.of("realm_access");
+    }
+
+    @Override
+    protected Set<String> extractRoles(Claims claims) {
+        Set<String> roles = new HashSet<>();
+        for (String key : getSetOfRolesObjectKeys()) {
+            if (claims.containsKey(key)) {
+                Map<String, Object> keyObj = (Map<String, Object>) claims.get(key);
+                roles.addAll((Collection<String>) keyObj.get("roles"));
+            } else {
+                System.out.println("no roles present with key " + key);
+            }
+        }
+        return roles;
     }
 
     @Test

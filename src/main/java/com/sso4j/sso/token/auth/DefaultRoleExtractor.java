@@ -9,6 +9,9 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * Class is default implementation of RoleExtractor interface
+ */
 public class DefaultRoleExtractor implements RoleExtractor {
 
     private Logger logger = LoggerFactory.getLogger(DefaultRoleExtractor.class);

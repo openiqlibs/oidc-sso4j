@@ -18,6 +18,9 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.*;
 
+/**
+ * Class is used to generate and validate token inside java app without third party sso
+ */
 public class InAppTokenAndCerts {
 
     private final Logger logger = LoggerFactory.getLogger(InAppTokenAndCerts.class);
@@ -26,38 +29,84 @@ public class InAppTokenAndCerts {
 
     public static final String REFRESH_TOKEN = "refreshToken";
 
+    /**
+     * used to sign jwt using this secret
+     */
     private String secret;
 
+    /**
+     * to set access validity of jwt access token
+     */
     private int accessTokenValidity;
 
+    /**
+     * to set access validity of jwt refersh token
+     */
     private int refreshTokenValidity;
 
+    /**
+     * to determine which method of signing to use secretKey or private/public Key
+     */
     private String keyToUse;
 
+    /**
+     * public key pem content
+     */
     private String publicKeyString;
 
+    /**
+     * private key pem content
+     */
     private String privateKeyString;
 
+    /**
+     * generated secret key get stored here
+     */
     private SecretKey secretKey;
 
+    /**
+     * generated public key stored here
+     */
     private PublicKey publicKey;
 
+    /**
+     * generated private key stored here
+     */
     private PrivateKey privateKey;
 
+    /**
+     * to set issuer
+     */
     private String issuer;
 
+    /**
+     * to set audience
+     */
     private String audience;
 
+    /**
+     * implemented role extractor instance
+     */
     private RoleExtractor roleExtractor;
 
+    /**
+     * private constructor
+     */
     private InAppTokenAndCerts() {}
 
+    /**
+     * to load secret key using secret string
+     * @return SecretKey
+     */
     protected void loadSecretKey() {
         logger.info("loading secret key");
         byte[] key = secret.getBytes();
         this.secretKey = Keys.hmacShaKeyFor(key);
     }
 
+    /**
+     * to load public key from public key string
+     */
     private void loadPublicKey() throws NoSuchAlgorithmException, InvalidKeySpecException {
         logger.info("loading public key");
         String publicKeyPEM = publicKeyString
@@ -71,6 +120,9 @@ public class InAppTokenAndCerts {
         publicKey = keyFactory.generatePublic(new X509EncodedKeySpec(decodedKey));
     }
 
+    /**
+     * to load private key from private key string
+     */
     private void loadPrivateKey() throws NoSuchAlgorithmException, InvalidKeySpecException {
         logger.info("loading private key");
         String privateKeyPEM = privateKeyString
@@ -84,6 +136,9 @@ public class InAppTokenAndCerts {
         privateKey = keyFactory.generatePrivate(new PKCS8EncodedKeySpec(decodedKey));
     }
 
+    /**
+     * to load secret key private key based on keytouse
+     */
     protected void loadSigningKeys() {
         if (keyToUse.equals(SigningKeyStandards.SECRET_KEY.getValue())) {
             loadSecretKey();
@@ -98,10 +153,18 @@ public class InAppTokenAndCerts {
         }
     }
 
+    /**
+     * string checking
+     * @param str
+     * @return boolean
+     */
     public static boolean isNullOrEmptyOrBlank(String str) {
         return str == null || str.isEmpty() || str.isBlank();
     }
 
+    /**
+     * to setup RoleExtractor instance
+     */
     private void setupRoleExtractor() {
         if (roleExtractor == null) {
             logger.info("setting default role extractor");
@@ -109,6 +172,10 @@ public class InAppTokenAndCerts {
         }
     }
 
+    /**
+     * to validate all needed fields are not null and present
+     * @throws RuntimeException
+     */
     protected void validateFields() {
         if (isNullOrEmptyOrBlank(keyToUse)) {
             throw new RuntimeException("initialize signing key standard using signing key standard enum");
@@ -139,6 +206,12 @@ public class InAppTokenAndCerts {
         }
     }
 
+    /**
+     * to get roles from token and also validate token using secret or private keys
+     * @param token
+     * @throws Exception
+     * @return Set<String>
+     */
     public Set<String> getRolesOfToken(String token) throws Exception {
         try {
             Claims claims = null;
@@ -154,6 +227,12 @@ public class InAppTokenAndCerts {
         }
     }
 
+    /**
+     * to generate pair of access token and refresh token
+     * @param claims
+     * @param subject
+     * @return Map<String, Object>
+     */
     public Map<String, String> generateTokenPair(Map<String, Object> claims, String subject) {
         Map<String, String> responseTokens = new HashMap<>();
         Calendar c = Calendar.getInstance();
@@ -168,6 +247,14 @@ public class InAppTokenAndCerts {
         return responseTokens;
     }
 
+    /**
+     * to generate token
+     * @param claims
+     * @param subject
+     * @param issueAt
+     * @param expireAt
+     * @return String
+     */
     public String doGenerateToken(Map<String, Object> claims, String subject, Date issueAt, Date expireAt) {
         JwtBuilder builder = Jwts.builder().subject(subject).claims(claims)
                 .issuedAt(issueAt)
@@ -182,6 +269,9 @@ public class InAppTokenAndCerts {
         return builder.compact();
     }
 
+    /**
+     * static inner builder class
+     */
     public static class Builder {
         private final InAppTokenAndCerts inAppTokenAndCerts;
 

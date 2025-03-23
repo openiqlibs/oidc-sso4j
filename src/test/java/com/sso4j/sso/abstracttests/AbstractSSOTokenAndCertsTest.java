@@ -27,8 +27,8 @@ public abstract class AbstractSSOTokenAndCertsTest {
 
     @Test
     public void testGetListOfRolesObjectKeys() {
-        Assert.assertNotNull(getSsoTokenAndCerts().getListOfRolesObjectKeys());
-        Assert.assertEquals(2, getSsoTokenAndCerts().getListOfRolesObjectKeys().size());
+        Assert.assertNotNull(getSsoTokenAndCerts().getSetOfRolesObjectKeys());
+        Assert.assertEquals(2, getSsoTokenAndCerts().getSetOfRolesObjectKeys().size());
     }
 
     @Test

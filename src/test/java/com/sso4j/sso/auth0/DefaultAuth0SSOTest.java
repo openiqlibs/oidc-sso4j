@@ -3,7 +3,6 @@ package com.sso4j.sso.auth0;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sso4j.sso.abstracttests.AbstractSSOTest;
-import com.sso4j.sso.defaults.auth.DefaultAuth0SSOTokenAndCerts;
 import com.sso4j.sso.keycloak.KeycloakSSOTest;
 import com.sso4j.sso.token.auth.AbstractSSOAuth;
 import com.sso4j.sso.token.auth.AbstractSSOTokenAndCerts;
@@ -21,7 +20,7 @@ import java.util.Set;
 
 public class DefaultAuth0SSOTest extends AbstractSSOTest {
 
-    DefaultAuth0SSOTokenAndCerts defaultAuth0SSOTokenAndCerts = new DefaultAuth0SSOTokenAndCerts(System.getenv("auth0_domain") + "/.well-known/jwks.json");
+    Auth0SSOTokenAndCerts auth0SSOTokenAndCerts = new Auth0SSOTokenAndCerts();
 
     public static Map<String, Object> auth0ssoResponse = new HashMap<>();
 
@@ -64,12 +63,12 @@ public class DefaultAuth0SSOTest extends AbstractSSOTest {
 
     @Override
     protected AbstractSSOTokenAndCerts getSsoTokenAndCerts() {
-        return defaultAuth0SSOTokenAndCerts;
+        return auth0SSOTokenAndCerts;
     }
 
     @Override
     protected AbstractSSOAuth getSSOAuth() {
-        return new Auth0SSOAuth(defaultAuth0SSOTokenAndCerts);
+        return new Auth0SSOAuth(auth0SSOTokenAndCerts);
     }
 
     @Override

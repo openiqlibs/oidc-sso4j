@@ -1,7 +1,6 @@
 package com.sso4j.sso.auth0;
 
 import com.sso4j.sso.abstracttests.AbstractSSOTokenAndCertsTest;
-import com.sso4j.sso.defaults.auth.DefaultAuth0SSOTokenAndCerts;
 import com.sso4j.sso.keycloak.AnotherKeycloakSSOAndCerts;
 import com.sso4j.sso.keycloak.KeyCloakSSOAuth;
 import com.sso4j.sso.keycloak.KeycloakSSOTest;
@@ -17,7 +16,7 @@ import java.io.IOException;
 public class DefaultAuth0SSOAndCertsClassTest extends AbstractSSOTokenAndCertsTest {
 
     private AnotherKeycloakSSOAndCerts anotherKeycloakSSOAndCerts = new AnotherKeycloakSSOAndCerts();
-    private DefaultAuth0SSOTokenAndCerts defaultAuth0SSOTokenAndCerts = new DefaultAuth0SSOTokenAndCerts(System.getenv("auth0_domain") + "/.well-known/jwks.json");
+    private Auth0SSOTokenAndCerts auth0SSOTokenAndCerts = new Auth0SSOTokenAndCerts();
 
     private static String token;
 
@@ -30,13 +29,13 @@ public class DefaultAuth0SSOAndCertsClassTest extends AbstractSSOTokenAndCertsTe
     @Override
     @Test
     public void testGetListOfRolesObjectKeys() {
-        Assert.assertNotNull(getSsoTokenAndCerts().getListOfRolesObjectKeys());
-        Assert.assertEquals(1, getSsoTokenAndCerts().getListOfRolesObjectKeys().size());
+        Assert.assertNotNull(getSsoTokenAndCerts().getSetOfRolesObjectKeys());
+        Assert.assertEquals(1, getSsoTokenAndCerts().getSetOfRolesObjectKeys().size());
     }
 
     @Override
     protected AbstractSSOTokenAndCerts getSsoTokenAndCerts() {
-        return defaultAuth0SSOTokenAndCerts;
+        return auth0SSOTokenAndCerts;
     }
 
     @Override

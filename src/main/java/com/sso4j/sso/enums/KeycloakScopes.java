@@ -1,5 +1,8 @@
 package com.sso4j.sso.enums;
 
+/**
+ * This enum is providing defined roles object keys {@code realm_access} and {@code resource_access}
+ */
 public enum KeycloakScopes {
 
     REALM_ACCESS("realm_access"),

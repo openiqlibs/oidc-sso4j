@@ -1,23 +1,21 @@
-package com.sso4j.sso.keycloak;
+package com.sso4j.sso.auth0;
 
 import com.sso4j.sso.token.auth.AbstractSSOTokenAndCerts;
 import io.jsonwebtoken.Claims;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
-public class KeyCloakSSOAndCerts extends AbstractSSOTokenAndCerts {
+public class Auth0SSOTokenAndCerts extends AbstractSSOTokenAndCerts {
 
     @Override
     public String getSSO_JWKsUrl() {
-        return "http://localhost:8080/realms/testing/protocol/openid-connect/certs";
+        return System.getenv("auth0_domain") + "/.well-known/jwks.json";
     }
 
     @Override
     public Set<String> getSetOfRolesObjectKeys() {
-        return Set.of("realm_access", "notExist");
+        return Set.of("scope");
     }
 
     @Override
@@ -25,8 +23,8 @@ public class KeyCloakSSOAndCerts extends AbstractSSOTokenAndCerts {
         Set<String> roles = new HashSet<>();
         for (String key : getSetOfRolesObjectKeys()) {
             if (claims.containsKey(key)) {
-                Map<String, Object> keyObj = (Map<String, Object>) claims.get(key);
-                roles.addAll((Collection<String>) keyObj.get("roles"));
+                String rolesString = claims.get(key).toString();
+                roles.addAll(Arrays.stream(rolesString.split(" ")).collect(Collectors.toSet()));
             } else {
                 System.out.println("no roles present with key " + key);
             }
