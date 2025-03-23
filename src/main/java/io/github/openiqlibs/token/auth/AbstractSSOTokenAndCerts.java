@@ -113,9 +113,9 @@ public abstract class AbstractSSOTokenAndCerts {
         for (Map<String, Object> key : keys) {
             try {
                 KeyFactory keyFactory = KeyFactory.getInstance(key.get("kty").toString());
-                Base64.Decoder urlDecoder = Base64.getUrlDecoder();
-                BigInteger modulus = new BigInteger(1, urlDecoder.decode(key.get("n").toString()));
-                BigInteger publicExponent = new BigInteger(1, urlDecoder.decode(key.get("e").toString()));
+                Base64.Decoder decoder = Base64.getUrlDecoder();
+                BigInteger modulus = new BigInteger(1, decoder.decode(key.get("n").toString()));
+                BigInteger publicExponent = new BigInteger(1, decoder.decode(key.get("e").toString()));
                 PublicKey publicKey = keyFactory.generatePublic(new RSAPublicKeySpec(modulus, publicExponent));
                 publicKeys.put(key.get("kid").toString(), publicKey);
             } catch (Exception e) {
