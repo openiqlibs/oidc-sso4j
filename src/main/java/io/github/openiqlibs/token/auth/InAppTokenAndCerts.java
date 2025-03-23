@@ -96,7 +96,6 @@ public class InAppTokenAndCerts {
 
     /**
      * to load secret key using secret string
-     * @return SecretKey
      */
     protected void loadSecretKey() {
         logger.info("loading secret key");
@@ -210,7 +209,7 @@ public class InAppTokenAndCerts {
      * to get roles from token and also validate token using secret or private keys
      * @param token
      * @throws Exception
-     * @return Set<String>
+     * @return {@code Set<String>}
      */
     public Set<String> getRolesOfToken(String token) throws Exception {
         try {
@@ -231,7 +230,7 @@ public class InAppTokenAndCerts {
      * to generate pair of access token and refresh token
      * @param claims
      * @param subject
-     * @return Map<String, Object>
+     * @return {@code Map<String, Object>}
      */
     public Map<String, String> generateTokenPair(Map<String, Object> claims, String subject) {
         Map<String, String> responseTokens = new HashMap<>();

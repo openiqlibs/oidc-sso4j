@@ -13,7 +13,7 @@ public interface RoleExtractor {
     /**
     * Method can be implemented to extract roles from claims object
      * @param claims
-     * @return Set<String>
+     * @return {@code Set<String>}
     */
     Set<String> extractRoles(Claims claims);
 }

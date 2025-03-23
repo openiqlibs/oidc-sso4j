@@ -26,6 +26,7 @@ public abstract class AbstractSSOAuth {
      * This method is used to get headers of jwt token
      * Takes jwt token and return headers map {@code Map<String, Object>}
      * @param token
+     * @throws IOException
      * @return {@code Map<String, Object>}
      */
     public Map<String, Object> getHeaders(String token) throws IOException {
@@ -40,6 +41,7 @@ public abstract class AbstractSSOAuth {
      * This method is used to get payload of jwt token
      * Takes jwt token and return payload map {@code Map<String, Object>}
      * @param token
+     * @throws IOException
      * @return {@code Map<String, Object>}
      */
     public Map<String, Object> getPayload(String token) throws IOException {

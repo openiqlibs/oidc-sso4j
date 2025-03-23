@@ -85,7 +85,7 @@ public abstract class AbstractSSOTokenAndCerts {
      * @param certs
      * @throws NoSuchAlgorithmException
      * @throws InvalidKeySpecException
-     * @return Map<String, Object> publicKeys
+     * @return {@code Map<String, Object>} publicKeys
      */
     protected Map<String, PublicKey> getPublicKeys(Map<String, Object> certs) throws NoSuchAlgorithmException, InvalidKeySpecException {
         Map<String, PublicKey> publicKeys = new HashMap<String, PublicKey>();
@@ -118,7 +118,7 @@ public abstract class AbstractSSOTokenAndCerts {
      * Abstract method need to be implemented in extended class which extracts roles from claims object
      * and returns set of string of roles
      * @param claims
-     * @return Set<String>
+     * @return {@code Set<String>}
      */
     protected abstract Set<String> extractRoles(Claims claims);
 
@@ -127,7 +127,7 @@ public abstract class AbstractSSOTokenAndCerts {
      * @param token
      * @param kid
      * @throws Exception
-     * @return Set<String>
+     * @return {@code Set<String>}
      */
     public Set<String> getRolesOfToken(String token, String kid) throws Exception {
         Claims claims;
