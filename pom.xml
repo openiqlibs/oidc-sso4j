@@ -123,17 +123,6 @@
         </configuration>
       </plugin>
 
-      <plugin>
-        <groupId>org.sonatype.central</groupId>
-        <artifactId>central-publishing-maven-plugin</artifactId>
-        <version>0.7.0</version>
-        <extensions>true</extensions>
-        <configuration>
-          <publishingServerId>central</publishingServerId>
-          <tokenAuth>true</tokenAuth>
-        </configuration>
-      </plugin>
-
       <!--maven gpg plugin-->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -163,7 +152,6 @@
             </goals>
             <configuration>
               <keyname>0xEB6F290B</keyname>
-              <passphraseServerId>0xEB6F290B</passphraseServerId>
               <gpgArguments>
                 <arg>--pinentry-mode</arg>
                 <arg>loopback</arg>
