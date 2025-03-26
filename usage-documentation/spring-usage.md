@@ -125,7 +125,7 @@ public class SSOAuth extends AbstractSSOAuth {
 ```
 Here `KeycloakSSO` is class we created earlier and injected here. and we have implemented `verifyAndExtractRoles()` method of `AbstractSSOAuth` class.
 we are getting `issuer` and `kid` using `getIssuer(getPayload(token))` and `getKid(getHeaders(token))` methods.
-and using issuer now we can decide which sso class to use like for example if we have another issuer or different realm issuer other than keycloak then we can use that class `verifyAndExtractRoles()` method to validate and extract roles of token.
+and using issuer now we can decide which sso class to use like for example if we have another issuer or different realm issuer other than keycloak then we can use that class `getRolesOfToken()` method to validate and extract roles of token.
 
 if you don't care about role just want to validate token then you can implement above class like following.
 ```java

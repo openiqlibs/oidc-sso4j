@@ -62,6 +62,36 @@ In properties set this variables using environment variable like below.
 jwt.private.key=${private_key}
 jwt.public.key=${public_key}
 ```
+## Custom RoleExtractor
+in above codes we haven't specified any roleExtractor so by default `DefaulRoleExtractor` gets injected and used. 
+but if we want to use our own custom RoleExtractor then we can implement as follows.
+```java
+@Configuration
+public class InAppJwtConfiguration {
+
+    @Value("${jwt.private.key}")
+    private String privateString;
+
+    @Value("${jwt.public.key}")
+    private String publicString;
+
+    @Bean
+    public InAppTokenAndCerts getInAppTokenAndCerts() {
+        return new InAppTokenAndCerts.Builder()
+                .setAccessTokenValidityInMinutes(10)
+                .setRefreshTokenValidityInHours(1)
+                .setRoleExtractor(claims -> Set.of())
+                .setAudience("testing")
+                .setIssuer("testing")
+                .usingSigningKeyStandard(SigningKeyStandards.PUBLIC_KEY)
+                .setPrivateKeyString(privateString)
+                .setPublicKeyString(publicString)
+                .build();
+    }
+}
+```
+here we have implemented anonymous method of `RoleExtractor` interface, but you can use class object which implements this interface.
+
 Now extend `AbstractSSOAuth` and implement method.
 
 ```java
