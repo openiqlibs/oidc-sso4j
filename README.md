@@ -1,5 +1,6 @@
 # oidc-sso4j
 ![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)
+![Version](https://img.shields.io/badge/version-1.0.0-brightgreen.svg)
 
 `oidc-sso4j` is an open source OpenId-connect Single-Sign-On(SSO) library for integrating SSO in java backends
 It is tested with `Keycloak` and `auth0` integrations. It has also In built Jwt token generation and authentication 
