@@ -6,7 +6,6 @@ import io.github.openiqlibs.enums.SigningKeyStandards;
 import io.github.openiqlibs.token.auth.InAppTokenAndCerts;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.List;
@@ -68,7 +67,6 @@ public abstract class InAppJwtSSOTest {
     }
 
     @Test
-    @Ignore
     public void testExpiredTokenFlow() throws Exception {
         Map<String, Object> claims = Map.of("roles", List.of("normal", "admin"));
         Map<String, String> tokenPair = getToTestExpiredToken().generateTokenPair(claims, "testUser");

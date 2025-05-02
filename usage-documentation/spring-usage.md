@@ -6,7 +6,7 @@ include the `oidc-sso4j` dependency in your project `pom.xml`
 <dependency>
     <groupId>io.github.openiqlibs</groupId>
     <artifactId>oidc-sso4j</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
 </dependency>
 ```
 

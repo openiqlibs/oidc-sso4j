@@ -1,7 +1,8 @@
 package io.github.openiqlibs.token.auth;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.github.openiqlibs.models.CertConfigurations;
+import io.github.openiqlibs.models.JwtCerts;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import org.slf4j.Logger;
@@ -71,7 +72,7 @@ public abstract class AbstractSSOTokenAndCerts {
      * @throws InterruptedException
      * @return {@code Map<String,Object>}
      */
-    protected Map<String, Object> getSSOCerts(String certsUrl) throws IOException, InterruptedException {
+    protected JwtCerts getSSOCerts(String certsUrl) throws IOException, InterruptedException {
         ObjectMapper objectMapper = new ObjectMapper();
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
@@ -81,12 +82,10 @@ public abstract class AbstractSSOTokenAndCerts {
         HttpResponse<String> response;
         try {
             response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            String responseBody = response.body();
             if (response.statusCode() != 200) {
-                throw new InterruptedException("responded with error code other than 200 " + responseBody);
+                throw new InterruptedException("responded with error code other than 200 " + response.body());
             }
-            return objectMapper.readValue(responseBody, new TypeReference<>() {
-            });
+            return objectMapper.readValue(response.body(), JwtCerts.class);
         } catch (Exception e) {
             logger.error("unable to download keys from host ", e);
             throw e;
@@ -95,31 +94,31 @@ public abstract class AbstractSSOTokenAndCerts {
 
     /**
      * Method is to load downloaded certs into publicKeyMap
-     * @param certs
+     * @param jwtCerts
      * @throws NoSuchAlgorithmException
      * @throws InvalidKeySpecException
      * @return {@code Map<String, Object>} publicKeys
      */
-    protected Map<String, PublicKey> getPublicKeys(Map<String, Object> certs) throws NoSuchAlgorithmException, InvalidKeySpecException {
+    protected Map<String, PublicKey> getPublicKeys(JwtCerts jwtCerts) throws NoSuchAlgorithmException, InvalidKeySpecException {
         Map<String, PublicKey> publicKeys = new HashMap<String, PublicKey>();
 
-        if (certs == null) {
+        if (jwtCerts == null) {
             logger.error("sso error :  Invalid certs fetched");
             return publicKeys;
         }
 
-        List<Map<String, Object>> keys = (List<Map<String, Object>>) certs.get("keys");
+        List<CertConfigurations> keys =  jwtCerts.getKeys();
 
-        for (Map<String, Object> key : keys) {
+        for (CertConfigurations key : keys) {
             try {
-                KeyFactory keyFactory = KeyFactory.getInstance(key.get("kty").toString());
+                KeyFactory keyFactory = KeyFactory.getInstance(key.getKty());
                 Base64.Decoder decoder = Base64.getUrlDecoder();
-                BigInteger modulus = new BigInteger(1, decoder.decode(key.get("n").toString()));
-                BigInteger publicExponent = new BigInteger(1, decoder.decode(key.get("e").toString()));
+                BigInteger modulus = new BigInteger(1, decoder.decode(key.getN()));
+                BigInteger publicExponent = new BigInteger(1, decoder.decode(key.getE()));
                 PublicKey publicKey = keyFactory.generatePublic(new RSAPublicKeySpec(modulus, publicExponent));
-                publicKeys.put(key.get("kid").toString(), publicKey);
+                publicKeys.put(key.getKid(), publicKey);
             } catch (Exception e) {
-                logger.error("sso error : Unable to generate public key from cert with kid: {}", key.get("kid").toString());
+                logger.error("sso error : Unable to generate public key from cert with kid: {}", key.getKid());
                 throw e;
             }
         }
@@ -163,7 +162,7 @@ public abstract class AbstractSSOTokenAndCerts {
      */
     public void downloadAndStorePublicKeys() throws IOException, InterruptedException, NoSuchAlgorithmException, InvalidKeySpecException {
         logger.info("downloading public keys from {}", getSSO_JWKsUrl());
-        Map<String,Object> certs = getSSOCerts(getSSO_JWKsUrl());
-        publicKeyMap = getPublicKeys(certs);
+        JwtCerts jwtCerts = getSSOCerts(getSSO_JWKsUrl());
+        publicKeyMap = getPublicKeys(jwtCerts);
     }
 }
