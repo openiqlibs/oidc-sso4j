@@ -1,5 +1,7 @@
 package io.github.openiqlibs.models;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,6 +13,10 @@ public class CertConfigurations {
     private String e;
     private String kid;
     private String x5t;
+
+    @JsonProperty("x5t#S256")
+    private String x5t_S256;
+
     private String alg;
     private List<String> x5c = new ArrayList<>();
 
@@ -60,6 +66,14 @@ public class CertConfigurations {
 
     public void setX5t(String x5t) {
         this.x5t = x5t;
+    }
+
+    public String getX5t_S256() {
+        return x5t_S256;
+    }
+
+    public void setX5t_S256(String x5t_S256) {
+        this.x5t_S256 = x5t_S256;
     }
 
     public String getAlg() {

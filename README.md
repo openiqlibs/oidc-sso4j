@@ -1,6 +1,6 @@
 # oidc-sso4j
 ![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)
-![Version](https://img.shields.io/badge/version-1.0.0-brightgreen.svg)
+![Version](https://img.shields.io/badge/version-1.0.1-brightgreen.svg)
 
 `oidc-sso4j` is an open source OpenId-connect Single-Sign-On(SSO) library for integrating SSO in java backends
 It is tested with `Keycloak` and `auth0` integrations. It has also In built Jwt token generation and authentication 
@@ -13,7 +13,7 @@ feature.
 <dependency>
     <groupId>io.github.openiqlibs</groupId>
     <artifactId>oidc-sso4j</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
 </dependency>
 ```
 include the above dependency in your `pom.xml` and to see detail usage of library

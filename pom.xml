@@ -4,7 +4,7 @@
 
   <groupId>io.github.openiqlibs</groupId>
   <artifactId>oidc-sso4j</artifactId>
-  <version>1.0.0</version>
+  <version>1.0.1</version>
   <packaging>jar</packaging>
 
   <name>oidc-sso4j</name>
@@ -13,6 +13,7 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <gpg.skip>false</gpg.skip>
   </properties>
 
   <licenses>
@@ -142,6 +143,9 @@
             </goals>
           </execution>
         </executions>
+        <configuration>
+          <skip>${gpg.skip}</skip>
+        </configuration>
       </plugin>
 
       <plugin>
@@ -156,11 +160,12 @@
               <goal>sign</goal>
             </goals>
             <configuration>
-              <keyname>0xEB6F290B</keyname>
+              <keyname>0xE97FFB30</keyname>
               <gpgArguments>
                 <arg>--pinentry-mode</arg>
                 <arg>loopback</arg>
               </gpgArguments>
+              <skip>${gpg.skip}</skip>
             </configuration>
           </execution>
         </executions>
