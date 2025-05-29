@@ -110,7 +110,7 @@ public class InAppJwtConfiguration {
                 .setAccessTokenValidityInMinutes(10)
                 .setRefreshTokenValidityInHours(1)
                 .setRoleExtractor(claims -> {
-                    if (!inMemDatabase.containsKey(claims.getSubject())) {
+                    if (!userRepo.exist(claims.getSubject())) {
                         throw new RuntimeException("no user found");
                     }
                     User user = userRepo.getUser(claims.getSubject());
