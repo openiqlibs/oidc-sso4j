@@ -8,6 +8,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -20,13 +21,23 @@ public abstract class InAppJwtSSOTest {
 
     public abstract InAppTokenAndCerts getInAppTokenAndCertsWithDiffSecretKey();
 
+    public abstract InAppTokenAndCerts getInAppTokenAndCertsWithDatabaseRoleExtractor();
+
+    public abstract Map<String, Map<String, Object>> getInMemDatabase();
+
     InAppJwtSSO inAppJwtSSO;
     InAppJwtSSO expiredInAppJwtSSO;
+    InAppJwtSSO databaseRoleExtractorSSO;
 
     @Before
     public void setupObjs() {
         inAppJwtSSO = new InAppJwtSSO(getInAppTokenAndCertsWithSecretKey());
         expiredInAppJwtSSO = new InAppJwtSSO(getToTestExpiredToken());
+        databaseRoleExtractorSSO = new InAppJwtSSO(getInAppTokenAndCertsWithDatabaseRoleExtractor());
+        Map<String, Object> user = new HashMap<>();
+        user.put("username", "testUser");
+        user.put("access_roles", List.of("normal", "admin"));
+        getInMemDatabase().put("testUser", user);
     }
 
     @Test
@@ -37,6 +48,29 @@ public abstract class InAppJwtSSOTest {
         Assert.assertNotNull(roles);
         Assert.assertEquals(2, roles.size());
         Assert.assertTrue(roles.contains("normal") && roles.contains("admin"));
+    }
+
+    @Test
+    public void testNormalExtractRoleFlowWithSecretKeyUsingDatabaseExtractor() throws Exception {
+        Map<String, Object> claims = Map.of("roles", List.of("normal", "admin"));
+        Map<String, String> tokenPair = getInAppTokenAndCertsWithDatabaseRoleExtractor().generateTokenPair(claims, "testUser");
+        Set<String> roles = databaseRoleExtractorSSO.verifyAndExtractRoles(tokenPair.get("accessToken"));
+        Assert.assertNotNull(roles);
+        Assert.assertEquals(2, roles.size());
+        Assert.assertTrue(roles.contains("normal") && roles.contains("admin"));
+    }
+
+    @Test
+    public void testNormalExtractRoleErrorFlowWithSecretKeyUsingDatabaseExtractor() throws Exception {
+        Map<String, Object> claims = Map.of("roles", List.of("normal", "admin"));
+        Map<String, String> tokenPair = getInAppTokenAndCertsWithDatabaseRoleExtractor().generateTokenPair(claims, "NotAvailabletestUser");
+        try {
+            Assert.assertThrows(RuntimeException.class, () -> databaseRoleExtractorSSO.verifyAndExtractRoles(tokenPair.get("accessToken")));
+        } catch (Exception e) {
+            boolean isRuntimeException = e instanceof RuntimeException;
+            Assert.assertTrue(isRuntimeException);
+            Assert.assertEquals("no user found", e.getMessage());
+        }
     }
 
     @Test
