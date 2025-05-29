@@ -92,6 +92,41 @@ public class InAppJwtConfiguration {
 ```
 here we have implemented anonymous method of `RoleExtractor` interface, but you can use class object which implements this interface.
 
+## Custom RoleExtractor with Database Lookup
+if we want to get roles not from jwt but directly from database using username then we can implement `extractRoles` method of `RoleExtractor` as following
+```java
+@Configuration
+public class InAppJwtConfiguration {
+
+    @Value("${jwt.encrypt.secret}")
+    private String secret;
+    
+    @Autowired
+    private UserRepo userRepo; // userRepo to user crud
+
+    @Bean
+    public InAppTokenAndCerts getInAppTokenAndCerts() {
+        return new InAppTokenAndCerts.Builder()
+                .setAccessTokenValidityInMinutes(10)
+                .setRefreshTokenValidityInHours(1)
+                .setRoleExtractor(claims -> {
+                    if (!inMemDatabase.containsKey(claims.getSubject())) {
+                        throw new RuntimeException("no user found");
+                    }
+                    User user = userRepo.getUser(claims.getSubject());
+                    List<String> accessRoles = user.getRoles();
+                    Set<String> roles = new HashSet<>(accessRoles);
+                    return roles;})
+                .setAudience("inApp")
+                .setIssuer("inApp")
+                .usingSigningKeyStandard(SigningKeyStandards.SECRET_KEY)
+                .setSecretValue(secret)
+                .build();
+    }
+}
+```
+here we implemented `extractRoles` method of `RoleExtractor` interface using database lookup where we are using userRepo to get user using username and then we are getting roles and setting it Set of Roles.
+
 Now extend `AbstractSSOAuth` and implement method.
 
 ```java
